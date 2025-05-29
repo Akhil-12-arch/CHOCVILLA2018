@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CHOCVILLA</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff8f0;
+      color: #5c3d2e;
+    }
+    header {
+      background-color: #d2691e;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    #authBtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: white;
+      color: #d2691e;
+      border: none;
+      padding: 8px 15px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    nav {
+      background: #a0522d;
+    }
+    nav ul {
+      display: flex;
+      justify-content: center;
+      padding: 10px;
+      margin: 0;
+      list-style: none;
+    }
+    nav ul li {
+      margin: 0 15px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .hero {
+      background: url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80') no-repeat center center/cover;
+      color: white;
+      text-align: center;
+      padding: 100px 20px;
+    }
+    section {
+      padding: 40px 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .menu-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .menu-items div {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      width: 200px;
+      text-align: center;
+      position: relative;
+    }
+    .menu-items img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .removeBtn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+    .addBtn {
+      display: none;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #d2691e;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #d2691e;
+      color: white;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .popup input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    .popup button {
+      width: 100%;
+      padding: 10px;
+      background: #a0522d;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .popup-close {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>CHOCVILLA</h1>
+    <p>Baking with love from my home to yours!</p>
+    <button id="authBtn">Edit</button>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <h1>Freshly Baked Happiness</h1>
+  </section>
+
+  <section id="about">
+    <h2>About Me</h2>
+    <p>Hello! I'm Lavanya, the heart and hands behind CHOCVILLA. Everything here is handmade, baked fresh, and filled with love.</p>
+  </section>
+
+  <section id="menu">
+    <h2>Our Menu</h2>
+    <div class="menu-items" id="menuItems"></div>
+    <button class="addBtn" id="addItem">+ Add Item</button>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Phone: <strong>+91 9490021604</strong></p>
+  </section>
+
+  <footer>
+    <p>© 2025 CHOCVILLA. All rights reserved.</p>
+  </footer>
+
+  <!-- Login Popup -->
+  <div class="popup" id="loginPopup">
+    <div class="popup-content">
+      <span class="popup-close" onclick="closePopup()">&times;</span>
+      <h3>Admin Login</h3>
+      <input type="text" id="phone" placeholder="Phone Number" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="checkLogin()">Login</button>
+      <p id="loginMsg" style="color:red; text-align:center;"></p>
+    </div>
+  </div>
+
+  <script>
+    const correctPhone = "9490021604";
+    const correctPassword = "ARAkhil@2012";
+
+    const authBtn = document.getElementById('authBtn');
+    const popup = document.getElementById('loginPopup');
+    const addBtn = document.getElementById('addItem');
+    const menuItems = document.getElementById('menuItems');
+
+    let isLoggedIn = false;
+
+    // Load items from localStorage
+    window.onload = () => {
+      const savedItems = JSON.parse(localStorage.getItem("menuItems")) || [];
+      savedItems.forEach(({ image, price }) => addItemToMenu(image, price));
+    };
+
+    authBtn.onclick = () => {
+      if (isLoggedIn) {
+        logout();
+      } else {
+        popup.style.display = "flex";
+      }
+    };
+
+    function closePopup() {
+      popup.style.display = "none";
+    }
+
+    function checkLogin() {
+      const phone = document.getElementById("phone").value;
+      const password = document.getElementById("password").value;
+      if (phone === correctPhone && password === correctPassword) {
+        isLoggedIn = true;
+        popup.style.display = "none";
+        addBtn.style.display = "block";
+        authBtn.textContent = "Logout";
+      } else {
+        document.getElementById("loginMsg").textContent = "Incorrect phone or password";
+      }
+    }
+
+    function logout() {
+      isLoggedIn = false;
+      addBtn.style.display = "none";
+      authBtn.textContent = "Edit";
+    }
+
+    addBtn.onclick = () => {
+      const imgInput = document.createElement("input");
+      imgInput.type = "file";
+      imgInput.accept = "image/*";
+
+      imgInput.onchange = function () {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const price = prompt("Enter the price:");
+            if (price) {
+              addItemToMenu(e.target.result, price);
+              saveToLocalStorage();
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      imgInput.click();
+    };
+
+    function addItemToMenu(imageSrc, price) {
+      const item = document.createElement("div");
+      const img = document.createElement("img");
+      const priceTag = document.createElement("p");
+      const removeBtn = document.createElement("button");
+
+      img.src = imageSrc;
+      priceTag.textContent = "₹" + price;
+      removeBtn.textContent = "×";
+      removeBtn.className = "removeBtn";
+
+      removeBtn.onclick = () => {
+        item.remove();
+        saveToLocalStorage();
+      };
+
+      item.appendChild(img);
+      item.appendChild(priceTag);
+      item.appendChild(removeBtn);
+      menuItems.appendChild(item);
+    }
+
+    function saveToLocalStorage() {
+      const items = [];
+      document.querySelectorAll(".menu-items > div").forEach(div => {
+        const img = div.querySelector("img").src;
+        const price = div.querySelector("p").textContent.replace("₹", "");
+        items.push({ image: img, price });
+      });
+      localStorage.setItem("menuItems", JSON.stringify(items));
+    }
+  </script>
+
+</body>
+</html>
